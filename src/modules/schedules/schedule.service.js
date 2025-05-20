@@ -18,13 +18,13 @@ const getScheduleByDoctorId = async (doctor_id) => {
   if(!doctor) throw new AppError("Error", status_code.NOT_FOUND, "Doctor not found");
 
   const result = await ScheduleRepository.findDoctorScheduleByDateRange(doctor_id);
-  const formattedResult = result.map((item) => responseFormat(item.toJSON()));
+  const formattedResult = result.map((item) => responseFormat(item.toJSON(), true));
 
   return formattedResult;
 }
 
-const responseFormat = (data) => {
-  return {
+const responseFormat = (data, methodGet = false) => {
+  const row = {
     id: data.id,
     doctor_id: data.doctor_id,
     day: data.day,
@@ -34,6 +34,9 @@ const responseFormat = (data) => {
     status: data.status,
     date: data.date?.toISOString().slice(0, 10),
   };
+
+  if(methodGet) row.doctor_name = data.doctor.name;
+  return row;
 }
 
 module.exports = {

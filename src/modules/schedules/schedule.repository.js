@@ -1,5 +1,5 @@
 const dayjs = require("dayjs");
-const { Schedule, sequelize } = require("../../models");
+const { Doctor,Schedule, sequelize } = require("../../models");
 const { DATE_TIME_FORMAT } = require("../../constants/date-format.constant");
 
 const createDoctorSchedulesByRange = async (data) => {
@@ -45,14 +45,15 @@ const createDoctorSchedulesByRange = async (data) => {
   }
 }
 
-const findDoctorScheduleByDateRange = async (doctor_id, date_range) => {
-  // const {  start_date, end_date } = date_range;
+const findDoctorScheduleByDateRange = async (doctor_id) => {
   const data = await Schedule.findAll({
+    include: {
+      model: Doctor,
+      as: 'doctor',
+      attributes: ['name'],
+    },
     where: {
       doctor_id,
-      // date: {
-      //   [Op.between]: [start_date, end_date]
-      // }
     }
   });
 
