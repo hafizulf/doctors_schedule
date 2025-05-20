@@ -32,7 +32,7 @@ module.exports = {
         type: Sequelize.BOOLEAN,
       },
       date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       created_at: {
         allowNull: false,

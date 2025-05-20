@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     time_finish: DataTypes.TIME,
     quota: DataTypes.INTEGER,
     status: DataTypes.BOOLEAN,
-    date: DataTypes.DATE,
+    date: DataTypes.DATEONLY,
   }, {
     sequelize,
     tableName: 'schedules',

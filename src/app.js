@@ -22,7 +22,7 @@ app.use('/api/health-check', (_req, res) => {
     .json({ message: 'Server is healthy' });
 });
 
-app.use('/api/schedules/', scheduleRouters);
+app.use('/api/schedules', scheduleRouters);
 
 app.use(errorHandler);
 
