@@ -1,26 +1,65 @@
-const { Op } = require("sequelize");
-const { Schedule } = require("../../models");
+const dayjs = require("dayjs");
+const { Schedule, sequelize } = require("../../models");
+const { DATE_TIME_FORMAT } = require("../../constants/date-format.constant");
 
-const create = async (data) => {
-  return await Schedule.create(data);
+const createDoctorSchedulesByRange = async (data) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const {
+      doctor_id,
+      day,
+      time_start,
+      time_finish,
+      quota,
+      status,
+      start_date,
+      end_date,
+    } = data;
+
+    const start = dayjs(start_date);
+    const end = dayjs(end_date);
+    const schedules = [];
+
+    for (let date = start; date.isBefore(end) || date.isSame(end); date = date.add(1, 'day')) {
+      schedules.push({
+        doctor_id,
+        day,
+        time_start,
+        time_finish,
+        quota,
+        status,
+        date: date.format(DATE_TIME_FORMAT.DATE),
+      });
+    }
+
+    const insertedRows = await Schedule.bulkCreate(schedules, {
+      returning: true, 
+      transaction,
+    });
+    
+    await transaction.commit();
+    return insertedRows;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 }
 
 const findDoctorScheduleByDateRange = async (doctor_id, date_range) => {
-  const {  start_date, end_date } = date_range;
+  // const {  start_date, end_date } = date_range;
   const data = await Schedule.findAll({
     where: {
       doctor_id,
-      date: {
-        [Op.between]: [start_date, end_date]
-      }
+      // date: {
+      //   [Op.between]: [start_date, end_date]
+      // }
     }
   });
 
-  console.log(data);
   return data;
 }
 
 module.exports = {
-  create,
+  createDoctorSchedulesByRange,
   findDoctorScheduleByDateRange,
 }

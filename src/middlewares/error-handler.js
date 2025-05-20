@@ -1,27 +1,45 @@
+const { DatabaseError, UniqueConstraintError } = require("sequelize");
 const AppError = require("../exceptions/app-error");
 
 function errorHandler(err, _req, res, _next) {
   if (err instanceof AppError) {
-    if (err.statusCode === 422) {
-      return res.status(422).json({
-        message: 'Validation Error',
-        errors: err.details,
-      });
-    }
-
     return res.status(err.statusCode).json({
       message: err.message,
-      errors: err.details,
+      errors: err.details ?? null,
     });
   }
 
-  console.error('Unhandled Error:', err);
+  if (err instanceof UniqueConstraintError) {
+    return res.status(409).json({
+      message: "Unique constraint violation",
+      errors: err.errors.map((e) => e.message),
+    });
+  }
 
-  return res.status(500).json(
-    process.env.NODE_ENV === 'production'
-      ? { message: 'Unknown error' }
-      : { message: err.message, error: err }
-  );
+  if (err instanceof DatabaseError) {
+    const code = err.parent?.code;
+    const message = err.message;
+
+    // Optional: handle specific PG error codes like 22P02 (invalid input syntax)
+    if (code === "22P02") {
+      return res.status(400).json({
+        message: "Invalid input: expected correct data type",
+        errors: message,
+      });
+    }
+
+    return res.status(400).json({
+      message: "Database error",
+      errors: message,
+    });
+  }
+
+  // Fallback error
+  console.error("Unhandled Error:", err);
+  return res.status(500).json({
+    message: process.env.NODE_ENV === "production" ? "Unknown error" : err.message,
+    error: process.env.NODE_ENV === "production" ? undefined : err,
+  });
 }
 
 module.exports = errorHandler;

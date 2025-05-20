@@ -6,30 +6,33 @@ const createSchedule = async (data) => {
   const doctor = await DoctorRepository.findOne(data.doctor_id);
   if(!doctor) throw new AppError("Error", 404, "Doctor not found");
 
-  return (await ScheduleRepository.create(data));
+  const result = await ScheduleRepository.createDoctorSchedulesByRange(data);
+  const formattedResult = result.map((item) => responseFormat(item.toJSON()));
+
+  return formattedResult;
 }
 
-const getScheduleByDoctorId = async (doctor_id, date_range) => {
+const getScheduleByDoctorId = async (doctor_id) => {
   const doctor = await DoctorRepository.findOne(doctor_id);
   if(!doctor) throw new AppError("Error", 404, "Doctor not found");
 
-  const result = await ScheduleRepository.findDoctorScheduleByDateRange(doctor_id, date_range);
-  const formattedResult = result.map((item) => {
-    const obj = item.toJSON();
-
-    return {
-      id: obj.id,
-      doctor_id: obj.doctor_id,
-      day: obj.day,
-      time_start: obj.time_start?.slice(0, 5),
-      time_finish: obj.time_finish?.slice(0, 5),
-      quota: obj.quota,
-      status: obj.status,
-      date: obj.date?.toISOString().slice(0, 10),
-    };
-  });
+  const result = await ScheduleRepository.findDoctorScheduleByDateRange(doctor_id);
+  const formattedResult = result.map((item) => responseFormat(item.toJSON()));
 
   return formattedResult;
+}
+
+const responseFormat = (data) => {
+  return {
+    id: data.id,
+    doctor_id: data.doctor_id,
+    day: data.day,
+    time_start: data.time_start?.slice(0, 5),
+    time_finish: data.time_finish?.slice(0, 5),
+    quota: data.quota,
+    status: data.status,
+    date: data.date?.toISOString().slice(0, 10),
+  };
 }
 
 module.exports = {

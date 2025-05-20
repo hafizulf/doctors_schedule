@@ -4,7 +4,6 @@ const scheduleService = require("./schedule.service");
 
 const createSchedule = async (req, res) => {
   const dataValidated = validateSchema(createScheduleSchema, req.body);
-
   const createSchedule = await scheduleService.createSchedule(dataValidated);
 
   return res.status(201).json({
@@ -14,18 +13,8 @@ const createSchedule = async (req, res) => {
 }
 
 const getScheduleByDoctorId = async (req, res) => {
-  const dataValidated = validateSchema(getScheduleByDoctorIdSchema, {
-    ...req.params,
-    ...req.body,
-  });
-
-  const getScheduleByDoctorId = await scheduleService.getScheduleByDoctorId(
-    dataValidated.doctor_id,
-    {
-      start_date: dataValidated.start_date,
-      end_date: dataValidated.end_date
-    }
-  );
+  const dataValidated = validateSchema(getScheduleByDoctorIdSchema, req.params);
+  const getScheduleByDoctorId = await scheduleService.getScheduleByDoctorId(dataValidated.doctor_id);
 
   return res.status(200).json({
     message: "Success",
