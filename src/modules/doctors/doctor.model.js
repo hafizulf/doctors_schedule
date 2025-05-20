@@ -19,18 +19,13 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER
     },
     name: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-    deletedAt: {
-      allowNull: true,
-      type: DataTypes.DATE
-    }
   }, {
     sequelize,
     tableName: 'doctors',
     modelName: 'Doctor',
     underscored: true,
     paranoid: true,
+    timestamps: true,
   });
   return Doctor;
 };

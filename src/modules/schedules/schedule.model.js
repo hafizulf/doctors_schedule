@@ -12,13 +12,34 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Schedule.init({
-    day: DataTypes.STRING
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    doctor_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'doctors',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    },
+    day: DataTypes.STRING,
+    time_start: DataTypes.TIME,
+    time_finish: DataTypes.TIME,
+    quota: DataTypes.INTEGER,
+    status: DataTypes.BOOLEAN,
+    date: DataTypes.DATE,
   }, {
     sequelize,
     tableName: 'schedules',
     modelName: 'Schedule',
     underscored: true,
     paranoid: true,
+    timestamps: true,
   });
   return Schedule;
 };
