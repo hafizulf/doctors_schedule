@@ -1,10 +1,11 @@
+const { status_code } = require("../../constants/status-code.constant");
 const AppError = require("../../exceptions/app-error");
 const DoctorRepository = require("../doctors/doctor.repository");
 const ScheduleRepository = require("./schedule.repository");
 
 const createSchedule = async (data) => {
   const doctor = await DoctorRepository.findOne(data.doctor_id);
-  if(!doctor) throw new AppError("Error", 404, "Doctor not found");
+  if(!doctor) throw new AppError("Error", status_code.NOT_FOUND, "Doctor not found");
 
   const result = await ScheduleRepository.createDoctorSchedulesByRange(data);
   const formattedResult = result.map((item) => responseFormat(item.toJSON()));
@@ -14,7 +15,7 @@ const createSchedule = async (data) => {
 
 const getScheduleByDoctorId = async (doctor_id) => {
   const doctor = await DoctorRepository.findOne(doctor_id);
-  if(!doctor) throw new AppError("Error", 404, "Doctor not found");
+  if(!doctor) throw new AppError("Error", status_code.NOT_FOUND, "Doctor not found");
 
   const result = await ScheduleRepository.findDoctorScheduleByDateRange(doctor_id);
   const formattedResult = result.map((item) => responseFormat(item.toJSON()));
