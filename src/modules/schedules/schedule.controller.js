@@ -14,6 +14,7 @@ const createSchedule = async (req, res) => {
 }
 
 const getScheduleByDoctorId = async (req, res) => {
+  console.log("req user >> ", req.user);
   const dataValidated = validateSchema(getScheduleByDoctorIdSchema, req.params);
   const getScheduleByDoctorId = await scheduleService.getScheduleByDoctorId(dataValidated.doctor_id);
 

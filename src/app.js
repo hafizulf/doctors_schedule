@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const { sequelize } = require('./models');
 const scheduleRouters = require('./modules/schedules/schedule.router');
+const webAuthRouters = require('./modules/web-auth/web-auth.route');
 const errorHandler = require('./middlewares/error-handler');
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/health-check', (_req, res) => {
 });
 
 app.use('/api/schedules', scheduleRouters);
+app.use('/api/web-auths', webAuthRouters);
 
 app.use(errorHandler);
 
